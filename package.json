@@ -1,0 +1,13 @@
+{
+  "name": "webflow",
+  "version": "1.0.0",
+  "description": "Integrate Webflow with Google Sheets via Sheetsu.",
+  "main": "index.js",
+  "repository": "https://github.com/EcstaticLiving/webflow.git",
+  "author": "Martin Adams <heymartinadams@users.noreply.github.com>",
+  "license": "SEE LICENSE IN README.md",
+  "private": false,
+  "dependencies": {
+    "webflow-api": "^0.4.1"
+  }
+}
