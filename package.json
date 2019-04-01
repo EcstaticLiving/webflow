@@ -8,6 +8,7 @@
   "license": "SEE LICENSE IN README.md",
   "private": false,
   "dependencies": {
+    "sheetsu-node": "^0.0.7",
     "webflow-api": "^0.4.1"
   }
 }
