@@ -46,7 +46,6 @@ module.exports = (body, callback) => {
 	// /*
 
 	let eventErrors = []
-	let eventUpdateCount = 0
 
 	sheetsu.read()
 		.then(sheetEventsJson => {
@@ -96,13 +95,10 @@ module.exports = (body, callback) => {
 									console.log('Updated event: ' + updatedEvent['name'])
 									callback(null, {
 										done: 'Webflow should now be updated. Please refresh Webflow to see the results.',
-										errors: eventUpdateCount === wfEvents.length - 1
-											? 'The update went smoothly with no errors.'
-											: eventErrors
+										errors: eventErrors
 									})
 								}
 								else {
-									eventUpdateCount += 1
 									console.log('Updated event: ' + updatedEvent['name'])
 								}
 							})
