@@ -46,6 +46,7 @@ module.exports = (body, callback) => {
 	// /*
 
 	let eventErrors = []
+	let count = 0
 
 	sheetsu.read()
 		.then(sheetEventsJson => {
@@ -91,11 +92,11 @@ module.exports = (body, callback) => {
 						updateWfEvent
 							// END
 							.then(i => {
+								count++
 								if (wfRow === wfEvents.length - 1) {
 									console.log('Updated event: ' + updatedEvent['name'])
 									callback(null, {
-										done: 'Webflow should now be updated. Please refresh Webflow to see the results.',
-										errors: eventErrors
+										done: 'Webflow should now be updated. Please refresh Webflow to see the results.'
 									})
 								}
 								else {
@@ -103,13 +104,16 @@ module.exports = (body, callback) => {
 								}
 							})
 							.catch(err => {
+								count++
 								console.log('Error with event: ' + updatedEvent['name'])
 								console.error(err)
-								const bugReport = {
-									event: updatedEvent['name'],
-									error: err
-								}
-								eventErrors.push(bugReport)
+								callback(null, {
+									error: {
+										event: updatedEvent['name'],
+										message: err.msg,
+										problem: err.problems
+									}
+								})
 							})
 
 					}, 1000)
