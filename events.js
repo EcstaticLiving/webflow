@@ -1,6 +1,5 @@
 /*
-Sheetsu API for each sheet: https://sheetsu.com/apis/v1.0su/b5300bfb6db8/sheets/Events
-wt create index.js --name eli-webflow --secret WEBFLOW=__TOKEN__ --parse-body
+wt create events.js --name eli-webflow-events --secret WEBFLOW=__TOKEN__ --parse-body
 */
 
 const Sheetsu = require('sheetsu-node')
@@ -67,10 +66,17 @@ module.exports = (body, callback) => {
 						const sheetEvent = sheetEvents.filter(sheetEvent => sheetEvent['_id'] === wfEvent['_id'])[0]
 
 						// Create image object and teachers array
-						const updatedSheetEvent = { ...sheetEvent, 'open-graph-image-2': { fileId: '', url: sheetEvent['og-url'] }, 'teacher-s': [...sheetEvent['teacher-s'].split(',')] }
+						const updatedSheetEvent = {
+							...sheetEvent,
+							'open-graph-image-2': { fileId: '', url: sheetEvent['og-url'] },
+							'teacher-s': [...sheetEvent['teacher-s'].split(',')]
+						}
 
 						// Combine Webflow event with sheet event, but give preference to sheet values
-						let updatedEvent = { ...wfEvent, ...updatedSheetEvent }
+						let updatedEvent = {
+							...wfEvent,
+							...updatedSheetEvent
+						}
 
 						// Remove key/values that cannot be updated in Webflow
 						delete updatedEvent['']
