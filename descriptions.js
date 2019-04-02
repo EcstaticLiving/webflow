@@ -15,7 +15,7 @@ module.exports = (body, callback) => {
 			categories: '5c89c6093726661c8496ff6a',
 			descriptions: '5c89c6093726665a2d96ff70',
 			durations: '5c89c6093726668eb696ff6c',
-			descriptions: '5c89c60937266680c496ff72',
+			events: '5c89c60937266680c496ff72',
 			faqs: '5c926d920b9dce120577ba32',
 			faqsctt: '5c927086ebad5605f4b179e3',
 			homepage: '5c89c60937266661b796ff2b',
@@ -38,7 +38,10 @@ module.exports = (body, callback) => {
 	// Cycle through each collection to get each item ID
 	/*
 		const items = webflow.items({ collectionId: ids.collection.descriptions })
-		items.then(i => console.log(i.items[0]))
+		items.then(i => {
+      const descriptions = i.items
+      descriptions.forEach(description => console.log(description['_id'], description['slug']))
+    })
 	*/
 
 	// STEP 1: Get spreadsheet data
@@ -62,15 +65,22 @@ module.exports = (body, callback) => {
 
 					// Add slight timeout since `JSON.parse(sheetDescriptionsJson)` appears to be async
 					setTimeout(() => {
-						// Find sheet description by Webflow’s ID
-						const sheetDescription = sheetDescriptions.filter(sheetDescription => sheetDescription['_id'] === wfDescription['_id'])[0]
 
-						// Create image objects and array from `Tags: Other`
+						// Find sheet description by Webflow’s ID
+            const sheetDescription = sheetDescriptions.filter(sheetDescription => sheetDescription['_id'] === wfDescription['_id'])[0]
+            
+            // Create image objects and array from `Tags: Other`
+            const ogUrl = sheetDescription['og-url']
+              ? { fileId: '', url: sheetDescription['og-url'] }
+              : ''
+            const otherTags = sheetDescription['tags-other-2']
+              ? [...sheetDescription['tags-other-2'].split(',')]
+              : []
 						const updatedSheetDescription = {
               ...sheetDescription,
-              'open-graph-image-2': { fileId: '', url: sheetDescription['og-url'] },
+              'open-graph-image-2': ogUrl,
               'image': { fileId: '', url: sheetDescription['image-url'] },
-              'tags-other-2': [...sheetDescription['tags-other-2'].split(',')]
+              'tags-other-2': otherTags
             }
 
 						// Combine Webflow description with sheet description, but give preference to sheet values
