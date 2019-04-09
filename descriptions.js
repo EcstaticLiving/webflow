@@ -47,9 +47,6 @@ module.exports = (body, callback) => {
 	// STEP 1: Get spreadsheet data
 	// /*
 
-	let descriptionErrors = []
-	let count = 0
-
 	sheetsu.read()
 		.then(sheetDescriptionsJson => {
 			const sheetDescriptions = JSON.parse(sheetDescriptionsJson)
@@ -97,6 +94,7 @@ module.exports = (body, callback) => {
 						delete updatedDescription['created-by']
 						delete updatedDescription['published-on']
 						delete updatedDescription['published-by']
+						updatedEvent['_draft'] = false
 
 						// Update Webflow
 						const updateWfDescription = webflow.updateItem({
@@ -107,19 +105,14 @@ module.exports = (body, callback) => {
 						updateWfDescription
 							// END
 							.then(i => {
-								count++
+								console.log('Updated description: ' + updatedDescription['name'])
 								if (wfRow === wfDescriptions.length - 1) {
-									console.log('Updated description: ' + updatedDescription['name'])
 									callback(null, {
 										done: 'Webflow should now be updated. Please refresh Webflow to see the results.'
 									})
 								}
-								else {
-									console.log('Updated description: ' + updatedDescription['name'])
-								}
 							})
 							.catch(err => {
-								count++
 								console.log('Error with description: ' + updatedDescription['name'])
 								console.error(err)
 								callback(null, {

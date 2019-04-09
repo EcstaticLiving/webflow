@@ -44,9 +44,6 @@ module.exports = (body, callback) => {
 	// STEP 1: Get spreadsheet data
 	// /*
 
-	let eventErrors = []
-	let count = 0
-
 	sheetsu.read()
 		.then(sheetEventsJson => {
 			const sheetEvents = JSON.parse(sheetEventsJson)
@@ -88,6 +85,7 @@ module.exports = (body, callback) => {
 						delete updatedEvent['created-by']
 						delete updatedEvent['published-on']
 						delete updatedEvent['published-by']
+						updatedEvent['_draft'] = false
 
 						// Update Webflow
 						const updateWfEvent = webflow.updateItem({
@@ -98,19 +96,14 @@ module.exports = (body, callback) => {
 						updateWfEvent
 							// END
 							.then(i => {
-								count++
+								console.log('Updated event: ' + updatedEvent['name'])
 								if (wfRow === wfEvents.length - 1) {
-									console.log('Updated event: ' + updatedEvent['name'])
 									callback(null, {
 										done: 'Webflow should now be updated. Please refresh Webflow to see the results.'
 									})
 								}
-								else {
-									console.log('Updated event: ' + updatedEvent['name'])
-								}
 							})
 							.catch(err => {
-								count++
 								console.log('Error with event: ' + updatedEvent['name'])
 								console.error(err)
 								callback(null, {
