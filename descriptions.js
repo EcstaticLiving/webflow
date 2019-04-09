@@ -94,7 +94,7 @@ module.exports = (body, callback) => {
 						delete updatedDescription['created-by']
 						delete updatedDescription['published-on']
 						delete updatedDescription['published-by']
-						updatedEvent['_draft'] = false
+						updatedDescription['_draft'] = false
 
 						// Update Webflow
 						const updateWfDescription = webflow.updateItem({
