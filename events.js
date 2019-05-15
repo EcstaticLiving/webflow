@@ -6,7 +6,6 @@ const Sheetsu = require('sheetsu-node')
 const Webflow = require('webflow-api')
 
 module.exports = (body, callback) => {
- 
 	const ids = {
 		site: '5c6dba8ca6c5f280b99da20d',
 		collection: {
@@ -34,7 +33,7 @@ module.exports = (body, callback) => {
 
 	const sheetsu = Sheetsu({ address: 'https://sheetsu.com/apis/v1.0su/b5300bfb6db8/sheets/Events' })
 	const webflow = new Webflow({ token: body.secrets.WEBFLOW })
-	
+
 	// Cycle through each collection to get each item ID
 	/*
 		const items = webflow.items({ collectionId: ids.collection.events })
@@ -44,23 +43,24 @@ module.exports = (body, callback) => {
 	// STEP 1: Get spreadsheet data
 	// /*
 
-	sheetsu.read()
+	sheetsu
+		.read()
 		.then(sheetEventsJson => {
 			const sheetEvents = JSON.parse(sheetEventsJson)
 
 			// STEP 2: Get events from Webflow
 			const wfEventsCollection = webflow.items({ collectionId: ids.collection.events })
 			wfEventsCollection.then(i => {
-
 				const wfEvents = i.items
 
 				// STEP 3: Cycle through each Webflow event and update event with sheet data
 				wfEvents.forEach((wfEvent, wfRow) => {
-
 					// Add slight timeout since `JSON.parse(sheetEventsJson)` appears to be async
 					setTimeout(() => {
 						// Find sheet event by Webflow’s ID
-						const sheetEvent = sheetEvents.filter(sheetEvent => sheetEvent['_id'] === wfEvent['_id'])[0]
+						const sheetEvent = sheetEvents.filter(
+							sheetEvent => sheetEvent['_id'] === wfEvent['_id']
+						)[0]
 
 						// Create image object and teachers array
 						const updatedSheetEvent = {
@@ -99,7 +99,8 @@ module.exports = (body, callback) => {
 								console.log('Updated event: ' + updatedEvent['name'])
 								if (wfRow === wfEvents.length - 1) {
 									callback(null, {
-										done: 'Webflow should now be updated. Please refresh Webflow to see the results.'
+										done:
+											'Webflow should now be updated. Please refresh Webflow to see the results.'
 									})
 								}
 							})
@@ -114,15 +115,10 @@ module.exports = (body, callback) => {
 									}
 								})
 							})
-
 					}, 1000)
-
 				})
-
 			})
-
 		})
 		.catch(err => console.error(err))
-		// */
-
+	// */
 }

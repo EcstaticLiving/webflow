@@ -6,7 +6,6 @@ const Sheetsu = require('sheetsu-node')
 const Webflow = require('webflow-api')
 
 module.exports = (body, callback) => {
- 
 	const ids = {
 		site: '5c6dba8ca6c5f280b99da20d',
 		collection: {
@@ -34,7 +33,7 @@ module.exports = (body, callback) => {
 
 	const sheetsu = Sheetsu({ address: 'https://sheetsu.com/apis/v1.0su/b5300bfb6db8/sheets/Blogs' })
 	const webflow = new Webflow({ token: body.secrets.WEBFLOW })
-	
+
 	// Cycle through collection to get each field ID
 	/*
 		const items = webflow.items({ collectionId: ids.collection.blogposts })
@@ -51,14 +50,14 @@ module.exports = (body, callback) => {
 
 	// STEP 1: Get spreadsheet data
 	// /*
-	sheetsu.read()
+	sheetsu
+		.read()
 		.then(sheetBlogPostsJson => {
 			const sheetBlogPosts = JSON.parse(sheetBlogPostsJson)
 
 			// STEP 2: Get blog posts from Webflow
 			const wfBlogPostsCollection = webflow.items({ collectionId: ids.collection.blogposts })
 			wfBlogPostsCollection.then(i => {
-
 				const wfBlogPosts = i.items
 
 				// STEP 3: Cycle through each Webflow blog post and update blog post with sheet data. Add slight timeout since `JSON.parse(sheetBlogPostsJson)` appears to be async.
@@ -67,12 +66,14 @@ module.exports = (body, callback) => {
 						const wfBlogPost = wfBlogPosts[wfRow]
 
 						// Find sheet blog post by Webflow’s ID
-						const sheetBlogPost = sheetBlogPosts.filter(sheetBlogPost => sheetBlogPost['_id'] === wfBlogPost['_id'])[0]
+						const sheetBlogPost = sheetBlogPosts.filter(
+							sheetBlogPost => sheetBlogPost['_id'] === wfBlogPost['_id']
+						)[0]
 
 						// Create image object and teachers array
 						const updatedSheetBlogPost = {
 							...sheetBlogPost,
-							'image': { fileId: '', url: sheetBlogPost['image-url'] }
+							image: { fileId: '', url: sheetBlogPost['image-url'] }
 							// 'open-graph-images': { fileId: '', url: sheetBlogPost['og-image-url'] }
 						}
 
@@ -110,7 +111,8 @@ module.exports = (body, callback) => {
 									console.log('Updated blog post: ' + updatedBlogPost['name'])
 									if (wfRow === wfBlogPosts.length - 1) {
 										callback(null, {
-											done: 'Webflow should now be updated. Please refresh Webflow to see the results.'
+											done:
+												'Webflow should now be updated. Please refresh Webflow to see the results.'
 										})
 									}
 								})
@@ -126,14 +128,10 @@ module.exports = (body, callback) => {
 									})
 								})
 						}, 2000)
-
 					}
 				}, 1000)
-
 			})
-
 		})
 		.catch(err => console.error(err))
-		// */
-
+	// */
 }

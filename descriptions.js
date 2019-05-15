@@ -6,7 +6,6 @@ const Sheetsu = require('sheetsu-node')
 const Webflow = require('webflow-api')
 
 module.exports = (body, callback) => {
- 
 	const ids = {
 		site: '5c6dba8ca6c5f280b99da20d',
 		collection: {
@@ -32,9 +31,11 @@ module.exports = (body, callback) => {
 		}
 	}
 
-	const sheetsu = Sheetsu({ address: 'https://sheetsu.com/apis/v1.0su/b5300bfb6db8/sheets/Descriptions' })
+	const sheetsu = Sheetsu({
+		address: 'https://sheetsu.com/apis/v1.0su/b5300bfb6db8/sheets/Descriptions'
+	})
 	const webflow = new Webflow({ token: body.secrets.WEBFLOW })
-	
+
 	// Cycle through each collection to get each item ID
 	/*
 		const items = webflow.items({ collectionId: ids.collection.descriptions })
@@ -47,38 +48,38 @@ module.exports = (body, callback) => {
 	// STEP 1: Get spreadsheet data
 	// /*
 
-	sheetsu.read()
+	sheetsu
+		.read()
 		.then(sheetDescriptionsJson => {
 			const sheetDescriptions = JSON.parse(sheetDescriptionsJson)
 
 			// STEP 2: Get descriptions from Webflow
 			const wfDescriptionsCollection = webflow.items({ collectionId: ids.collection.descriptions })
 			wfDescriptionsCollection.then(i => {
-
 				const wfDescriptions = i.items
 
 				// STEP 3: Cycle through each Webflow description and update description with sheet data
 				wfDescriptions.forEach((wfDescription, wfRow) => {
-
 					// Add slight timeout since `JSON.parse(sheetDescriptionsJson)` appears to be async
 					setTimeout(() => {
-
 						// Find sheet description by Webflow’s ID
-            const sheetDescription = sheetDescriptions.filter(sheetDescription => sheetDescription['_id'] === wfDescription['_id'])[0]
-            
-            // Create image objects and array from `Tags: Other`
-            const ogUrl = sheetDescription['og-url']
-              ? { fileId: '', url: sheetDescription['og-url'] }
-              : ''
-            const otherTags = sheetDescription['tags-other-2']
-              ? [...sheetDescription['tags-other-2'].split(',')]
-              : []
+						const sheetDescription = sheetDescriptions.filter(
+							sheetDescription => sheetDescription['_id'] === wfDescription['_id']
+						)[0]
+
+						// Create image objects and array from `Tags: Other`
+						const ogUrl = sheetDescription['og-url']
+							? { fileId: '', url: sheetDescription['og-url'] }
+							: ''
+						const otherTags = sheetDescription['tags-other-2']
+							? [...sheetDescription['tags-other-2'].split(',')]
+							: []
 						const updatedSheetDescription = {
-              ...sheetDescription,
-              'open-graph-image-2': ogUrl,
-              'image': { fileId: '', url: sheetDescription['image-url'] },
-              'tags-other-2': otherTags
-            }
+							...sheetDescription,
+							'open-graph-image-2': ogUrl,
+							image: { fileId: '', url: sheetDescription['image-url'] },
+							'tags-other-2': otherTags
+						}
 
 						// Combine Webflow description with sheet description, but give preference to sheet values
 						let updatedDescription = { ...wfDescription, ...updatedSheetDescription }
@@ -86,8 +87,8 @@ module.exports = (body, callback) => {
 						// Remove key/values that cannot be updated in Webflow
 						delete updatedDescription['']
 						delete updatedDescription['_id']
-            delete updatedDescription['og-url']
-            delete updatedDescription['image-url']
+						delete updatedDescription['og-url']
+						delete updatedDescription['image-url']
 						delete updatedDescription['updated-on']
 						delete updatedDescription['updated-by']
 						delete updatedDescription['created-on']
@@ -108,7 +109,8 @@ module.exports = (body, callback) => {
 								console.log('Updated description: ' + updatedDescription['name'])
 								if (wfRow === wfDescriptions.length - 1) {
 									callback(null, {
-										done: 'Webflow should now be updated. Please refresh Webflow to see the results.'
+										done:
+											'Webflow should now be updated. Please refresh Webflow to see the results.'
 									})
 								}
 							})
@@ -123,15 +125,10 @@ module.exports = (body, callback) => {
 									}
 								})
 							})
-
 					}, 1000)
-
 				})
-
 			})
-
 		})
 		.catch(err => console.error(err))
-		// */
-
+	// */
 }
